@@ -4,7 +4,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import ru.job4j.model.User;
 import ru.job4j.repository.UserRepository;
 
 @Service
@@ -25,16 +27,18 @@ public class TgRemoteService extends TelegramLongPollingBot {
     @Override
     public void onUpdateReceived(Update update) {
         if (update.hasMessage() && update.getMessage().hasText()) {
-            String messageText = update.getMessage().getText();
-            long chatId = update.getMessage().getChatId();
-            SendMessage message = new SendMessage();
-            message.setChatId(chatId);
-            message.setText(messageText + "Сам ты пидор");
-            try {
-                execute(message);
-            } catch (Exception e) {
-                e.printStackTrace();
+            Message message = update.getMessage();
+            if ("/sosi".equals(message.getText())) {
+                long chatId = message.getChatId();
+                User user = new User();
+                user.setClientId(message.getFrom().getId());
+                user.setChatId(chatId);
+                userRepository.save(user);
+
             }
+            SendMessage sendMessage = new SendMessage();
+            sendMessage.setText("Sosi sam");
+            sendMsg(sendMessage);
         }
     }
 
@@ -46,5 +50,13 @@ public class TgRemoteService extends TelegramLongPollingBot {
     @Override
     public String getBotUsername() {
         return botName;
+    }
+
+    private void sendMsg(SendMessage message) {
+        try {
+            execute(message);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
