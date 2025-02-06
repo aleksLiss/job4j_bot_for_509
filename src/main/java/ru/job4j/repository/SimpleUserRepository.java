@@ -1,11 +1,13 @@
 package ru.job4j.repository;
 
+import org.springframework.stereotype.Repository;
 import ru.job4j.model.User;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+@Repository
 public class SimpleUserRepository implements UserRepository {
 
     private final Map<Long, User> userStorage;
