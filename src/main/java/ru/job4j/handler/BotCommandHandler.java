@@ -6,7 +6,7 @@ import ru.job4j.model.Content;
 @Service
 public class BotCommandHandler {
 
-    void receive(Content content) {
+    public void receive(Content content) {
         System.out.println(content);
     }
 }
