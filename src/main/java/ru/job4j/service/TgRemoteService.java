@@ -5,17 +5,21 @@ import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import ru.job4j.repository.UserRepository;
 
 @Service
 public class TgRemoteService extends TelegramLongPollingBot {
 
     private final String botName;
     private final String botToken;
+    private final UserRepository userRepository;
 
     public TgRemoteService(@Value("${telegram.bot.name}") String botName,
-                           @Value("${telegram.bot.token}") String botToken) {
+                           @Value("${telegram.bot.token}") String botToken,
+                           UserRepository userRepository) {
         this.botName = botName;
         this.botToken = botToken;
+        this.userRepository = userRepository;
     }
 
     @Override
