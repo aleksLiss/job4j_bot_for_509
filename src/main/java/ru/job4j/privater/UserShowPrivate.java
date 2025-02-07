@@ -1,7 +1,9 @@
 package ru.job4j.privater;
 
+import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
+@Service
 public class UserShowPrivate implements ShowPrivate {
     @Override
     public String getUserFirstName(Update update) {
