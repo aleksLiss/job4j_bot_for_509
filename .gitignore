@@ -89,4 +89,4 @@ nb-configuration.xml
 ##############################
 *.log
 
-src/main/resources/application.properties
+*.properties
