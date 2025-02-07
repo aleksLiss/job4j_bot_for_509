@@ -17,4 +17,19 @@ public class UserShowPrivate implements ShowPrivate {
     public Long getUserId(Update update) {
         return update.getMessage().getFrom().getId();
     }
+
+    @Override
+    public String getAllInfo(Update update) {
+        StringBuilder userInfo = new StringBuilder();
+        userInfo.append("First name: ")
+                .append(getUserFirstName(update))
+                .append("\n")
+                .append("Last name: ")
+                .append(getUserLastName(update))
+                .append("\n")
+                .append("User id: ")
+                .append(getUserId(update))
+                .append(".");
+        return userInfo.toString();
+    }
 }

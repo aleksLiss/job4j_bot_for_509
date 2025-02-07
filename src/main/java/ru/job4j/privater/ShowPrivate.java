@@ -9,4 +9,6 @@ public interface ShowPrivate {
     String getUserLastName(Update update);
 
     Long getUserId(Update update);
+
+    String getAllInfo(Update update);
 }
