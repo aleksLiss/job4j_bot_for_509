@@ -27,18 +27,12 @@ public class TgRemoteService extends TelegramLongPollingBot {
     @Override
     public void onUpdateReceived(Update update) {
         if (update.hasMessage() && update.getMessage().hasText()) {
-            Message message = update.getMessage();
-            if ("/sosi".equals(message.getText())) {
-                long chatId = message.getChatId();
-                User user = new User();
-                user.setClientId(message.getFrom().getId());
-                user.setChatId(chatId);
-                userRepository.save(user);
-
-            }
-            SendMessage sendMessage = new SendMessage();
-            sendMessage.setText("Sosi sam");
-            sendMsg(sendMessage);
+            String messageText = update.getMessage().getText();
+            long chatId = update.getMessage().getChatId();
+            SendMessage message = new SendMessage();
+            message.setChatId(chatId);
+            message.setText("Вы написали: " + messageText);
+            sendMsg(message);
         }
     }
 
