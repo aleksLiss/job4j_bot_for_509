@@ -43,7 +43,11 @@ public class Sql2oUserRepository implements UserRepository {
 
     @Override
     public Collection<User> findAll() {
-        return List.of();
+        try (Connection connection = sql2o.open()) {
+            Query sql = connection.createQuery("SELECt * FROM users");
+            List<User> users = sql.setColumnMappings(User.COLUMN_MAPPING).executeAndFetch(User.class);
+            return users;
+        }
     }
 
     @Override
