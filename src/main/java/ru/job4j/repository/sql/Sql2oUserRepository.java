@@ -22,7 +22,7 @@ public class Sql2oUserRepository implements UserRepository {
     @Override
     public User save(User user) {
         try (Connection connection = sql2o.open()) {
-            Query sql = connection.createQuery("INSER INTO users (first_name, last_name) VALUES (:firstName, :lastName)",
+            Query sql = connection.createQuery("INSERT INTO users (first_name, last_name) VALUES (:firstName, :lastName)",
                             true)
                     .addParameter("firstName", user.getFirstName())
                     .addParameter("lastName", user.getLastName());
