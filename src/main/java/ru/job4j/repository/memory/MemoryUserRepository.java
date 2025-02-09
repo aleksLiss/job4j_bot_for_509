@@ -1,7 +1,8 @@
-package ru.job4j.repository;
+package ru.job4j.repository.memory;
 
 import org.springframework.stereotype.Repository;
 import ru.job4j.model.User;
+import ru.job4j.repository.UserRepository;
 
 import java.util.Collection;
 import java.util.HashMap;
