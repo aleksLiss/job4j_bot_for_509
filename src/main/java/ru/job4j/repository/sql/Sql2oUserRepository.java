@@ -44,14 +44,17 @@ public class Sql2oUserRepository implements UserRepository {
     @Override
     public Collection<User> findAll() {
         try (Connection connection = sql2o.open()) {
-            Query sql = connection.createQuery("SELECt * FROM users");
-            List<User> users = sql.setColumnMappings(User.COLUMN_MAPPING).executeAndFetch(User.class);
-            return users;
+            Query sql = connection.createQuery("SELECT * FROM users");
+            return sql.setColumnMappings(User.COLUMN_MAPPING).executeAndFetch(User.class);
         }
     }
 
     @Override
     public void deleteById(Long clientId) {
-
+        try (Connection connection = sql2o.open()) {
+            Query sql = connection.createQuery("DELETE FROM users WHERE client_id = :clientId")
+                    .addParameter("clientId", clientId);
+            sql.executeUpdate();
+        }
     }
 }
