@@ -56,7 +56,7 @@ public class Sql2oUserRepository implements UserRepository {
         Collection<User> users = List.of();
         try (Connection connection = sql2o.open()) {
             Query sql = connection.createQuery("SELECT * FROM users");
-            users = sql.setColumnMappings(User.COLUMN_MAPPING).executeAndFetch(User.class);
+            users = sql.executeAndFetch(User.class);
         } catch (Exception ex) {
             LOGGER.error(ex.getMessage());
         }
