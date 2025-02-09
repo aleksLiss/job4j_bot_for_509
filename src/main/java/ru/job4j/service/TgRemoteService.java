@@ -11,6 +11,8 @@ import ru.job4j.bussines.Runner;
 import ru.job4j.model.User;
 import ru.job4j.repository.sql.Sql2oUserRepository;
 
+import java.util.Optional;
+
 @Service
 public class TgRemoteService extends TelegramLongPollingBot implements Runner {
 
@@ -39,12 +41,10 @@ public class TgRemoteService extends TelegramLongPollingBot implements Runner {
         String command = update.getMessage().getText();
         switch (command) {
             case "/add":
-//                help(update);
                 add(update);
                 return;
             case "/delete":
-                help(update);
-//                delete();
+                delete(update);
                 return;
             case "/start":
                 help(update);
@@ -79,31 +79,50 @@ public class TgRemoteService extends TelegramLongPollingBot implements Runner {
 
     private void add(Update update) {
         try {
+            User savedUser = new User();
+            savedUser.setClientId(update.getMessage().getFrom().getId().intValue());
+            savedUser.setFirstName(update.getMessage().getFrom().getFirstName());
+            savedUser.setLastName(update.getMessage().getFrom().getLastName());
+            SendMessage message = new SendMessage();
+            Optional<User> res = sql2oUserRepository.save(savedUser);
+            if (res.isPresent()) {
+                long chatId = update.getMessage().getChatId();
+                message.setChatId(chatId);
+                message.setText("Пользователь добавлен в базу.");
+                sendMsg(message);
+                return;
+            }
+            message = new SendMessage();
+            long chatId = update.getMessage().getChatId();
+            message.setChatId(chatId);
+            message.setText("Такой пользователь уже есть в базе.");
+            sendMsg(message);
+        } catch (Exception ex) {
+            LOGGER.error(ex.getMessage());
+            ex.printStackTrace();
+        }
+    }
+
+    private void delete(Update update) {
+        try {
             String messageText = update.getMessage().getText();
             User savedUser = new User();
-            sql2oUserRepository.save(savedUser);
+            savedUser.setClientId(update.getMessage().getFrom().getId().intValue());
+            savedUser.setFirstName(update.getMessage().getFrom().getFirstName());
+            savedUser.setLastName(update.getMessage().getFrom().getLastName());
+            sql2oUserRepository.deleteById(savedUser.getClientId());
             long chatId = update.getMessage().getChatId();
             SendMessage message = new SendMessage();
             message.setChatId(chatId);
-            message.setText("Вы написали: " + messageText + "\n");
+            message.setText("Пользователь удален из базы.");
             sendMsg(message);
         } catch (Exception exception) {
             SendMessage sendErrMsg = new SendMessage();
             sendErrMsg.setText("Ошибка добавления пользователя в базу данных.");
             sendMsg(sendErrMsg);
+            LOGGER.error(exception.getMessage());
             exception.printStackTrace();
         }
-    }
-
-    private void delete(Update update) {
-        String messageText = update.getMessage().getText();
-        long chatId = update.getMessage().getChatId();
-        SendMessage message = new SendMessage();
-//            update.getMessage().getFrom();
-//            User user = new User();
-        message.setChatId(chatId);
-        message.setText("Вы написали: " + messageText + "\n" + update.hasChannelPost());
-        sendMsg(message);
     }
 
     private void start(Update update) {
@@ -113,7 +132,7 @@ public class TgRemoteService extends TelegramLongPollingBot implements Runner {
 //            update.getMessage().getFrom();
 //            User user = new User();
         message.setChatId(chatId);
-        message.setText("Вы написали: " + messageText + "\n" +  update.hasChannelPost());
+        message.setText("Вы написали: " + messageText + "\n" + update.hasChannelPost());
         sendMsg(message);
     }
 

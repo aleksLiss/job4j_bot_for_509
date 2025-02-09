@@ -10,7 +10,6 @@ import ru.job4j.model.User;
 import ru.job4j.repository.UserRepository;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -40,6 +39,7 @@ public class Sql2oUserRepository implements UserRepository {
             return Optional.of(user);
         } catch (Exception ex) {
             LOGGER.error(ex.getMessage());
+            ex.getMessage();
         }
         return Optional.empty();
     }
