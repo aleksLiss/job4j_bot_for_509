@@ -7,11 +7,11 @@ import java.util.Optional;
 
 public interface UserRepository {
 
-    User save(User user);
+    Optional<User> save(User user);
 
-    Optional<User> findByClientId(Long clientId);
+    Optional<User> findByClientId(Integer clientId);
 
     Collection<User> findAll();
 
-    void deleteById(Long clientId);
+    boolean deleteById(Integer clientId);
 }

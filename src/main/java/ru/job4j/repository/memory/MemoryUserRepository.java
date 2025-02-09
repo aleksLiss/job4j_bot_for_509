@@ -12,19 +12,19 @@ import java.util.Optional;
 @Repository
 public class MemoryUserRepository implements UserRepository {
 
-    private final Map<Long, User> userStorage;
+    private final Map<Integer, User> userStorage;
 
     public MemoryUserRepository() {
         this.userStorage = new HashMap<>();
     }
 
     @Override
-    public User save(User user) {
-        return userStorage.put(user.getClientId(), user);
+    public Optional<User> save(User user) {
+        return Optional.ofNullable(userStorage.put(user.getId(), user));
     }
 
     @Override
-    public Optional<User> findByClientId(Long clientId) {
+    public Optional<User> findByClientId(Integer clientId) {
         return Optional.ofNullable(userStorage.get(clientId));
     }
 
@@ -34,7 +34,8 @@ public class MemoryUserRepository implements UserRepository {
     }
 
     @Override
-    public void deleteById(Long clientId) {
+    public boolean deleteById(Integer clientId) {
         userStorage.remove(clientId);
+        return true;
     }
 }

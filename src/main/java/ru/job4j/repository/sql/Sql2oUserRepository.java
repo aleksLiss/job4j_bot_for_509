@@ -24,53 +24,58 @@ public class Sql2oUserRepository implements UserRepository {
     }
 
     @Override
-    public User save(User user) {
+    public Optional<User> save(User user) {
+        Optional<User> foundUser = findByClientId(user.getClientId());
+        if (foundUser.isPresent()) {
+            throw new RuntimeException("Такой пользователь уже есть в базе.");
+        }
         try (Connection connection = sql2o.open()) {
-            Query sql = connection.createQuery("INSERT INTO users (first_name, last_name) VALUES (:firstName, :lastName)",
+            String sql = """
+                    INSERT INTO users (client_id, first_name, last_name)
+                    VALUES (:clientId, :firstName, :lastName)
+                    """;
+            Query query = connection.createQuery(sql,
                             true)
+                    .addParameter("clientId", user.getClientId())
                     .addParameter("firstName", user.getFirstName())
                     .addParameter("lastName", user.getLastName());
-            int generatedId = sql.executeUpdate().getKey(Integer.class);
+            int generatedId = query.executeUpdate().getResult();
             user.setId(generatedId);
+            return Optional.ofNullable(user);
         } catch (Exception ex) {
             LOGGER.error(ex.getMessage());
         }
-        return user;
+        return Optional.empty();
     }
 
     @Override
-    public Optional<User> findByClientId(Long clientId) {
-        User foundUser = null;
+    public Optional<User> findByClientId(Integer clientId) {
         try (Connection connection = sql2o.open()) {
-            Query sql = connection.createQuery("SELECT * FROM users WHERE client_id = :clientId")
+            String sql = "SELECT * FROM users WHERE client_id = :clientId";
+            Query query = connection.createQuery(sql)
                     .addParameter("clientId", clientId);
-            foundUser = sql.executeAndFetchFirst(User.class);
-        } catch (Exception ex) {
-            LOGGER.error(ex.getMessage());
+            return Optional.ofNullable(query.setColumnMappings(User.COLUMN_MAPPING).executeAndFetchFirst(User.class));
         }
-        return Optional.ofNullable(foundUser);
     }
 
     @Override
     public Collection<User> findAll() {
-        Collection<User> users = List.of();
         try (Connection connection = sql2o.open()) {
-            Query sql = connection.createQuery("SELECT * FROM users");
-            users = sql.executeAndFetch(User.class);
-        } catch (Exception ex) {
-            LOGGER.error(ex.getMessage());
+            Query query = connection.createQuery("SELECT * FROM users");
+            Collection<User> users = query.setColumnMappings(User.COLUMN_MAPPING).executeAndFetch(User.class);
+            return users;
         }
-        return users;
     }
 
     @Override
-    public void deleteById(Long clientId) {
+    public boolean deleteById(Integer clientId) {
+        boolean isDeleted;
         try (Connection connection = sql2o.open()) {
-            Query sql = connection.createQuery("DELETE FROM users WHERE client_id = :clientId")
+            Query query = connection.createQuery("DELETE FROM users WHERE client_id = :clientId")
                     .addParameter("clientId", clientId);
-            sql.executeUpdate();
-        } catch (Exception ex) {
-            LOGGER.error(ex.getMessage());
+            query.executeUpdate();
+            isDeleted = connection.getResult() != 0;
         }
+        return isDeleted;
     }
 }
