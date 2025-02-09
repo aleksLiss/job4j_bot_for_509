@@ -1,5 +1,6 @@
 package ru.job4j.repository.sql;
 
+import org.springframework.stereotype.Repository;
 import org.sql2o.Connection;
 import org.sql2o.Query;
 import org.sql2o.Sql2o;
@@ -7,9 +8,9 @@ import ru.job4j.model.User;
 import ru.job4j.repository.UserRepository;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Optional;
 
+@Repository
 public class Sql2oUserRepository implements UserRepository {
 
     private final Sql2o sql2o;
