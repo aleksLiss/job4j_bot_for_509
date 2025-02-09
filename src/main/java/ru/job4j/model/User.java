@@ -8,14 +8,12 @@ public class User {
     public static final Map<String, String> COLUMN_MAPPING = Map.of(
             "id", "id",
             "client_id", "clientId",
-            "chat_id", "chatId",
             "first_name", "firstName",
             "last_name", "lastName"
     );
 
     private int id;
     private long clientId;
-    private long chatId;
     private String firstName;
     private String lastName;
 
@@ -49,14 +47,6 @@ public class User {
 
     public void setClientId(long clientId) {
         this.clientId = clientId;
-    }
-
-    public long getChatId() {
-        return chatId;
-    }
-
-    public void setChatId(long chatId) {
-        this.chatId = chatId;
     }
 
     @Override
