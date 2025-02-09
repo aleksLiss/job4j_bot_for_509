@@ -1,5 +1,7 @@
 package ru.job4j.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
@@ -18,6 +20,7 @@ public class TgRemoteService extends TelegramLongPollingBot implements Runner {
     private final String botToken;
     private final Sql2oUserRepository sql2oUserRepository;
     private final ShowPrivate showPrivate;
+    public static final Logger LOGGER = LoggerFactory.getLogger(TgRemoteService.class);
 
     public TgRemoteService(@Value("${telegram.bot.name}") String botName,
                            @Value("${telegram.bot.token}") String botToken,
@@ -84,7 +87,7 @@ public class TgRemoteService extends TelegramLongPollingBot implements Runner {
             SendMessage message = new SendMessage();
             User savedUser = new User();
             savedUser.setClientId(showPrivate.getUserId(update));
-            savedUser.setChatId(update.getMessage().getChatId());
+//            savedUser.setChatId(update.getMessage().getChatId());
             savedUser.setFirstName(showPrivate.getUserFirstName(update));
             savedUser.setLastName(showPrivate.getUserLastName(update));
             sql2oUserRepository.save(savedUser);
@@ -121,13 +124,19 @@ public class TgRemoteService extends TelegramLongPollingBot implements Runner {
     }
 
     private void help(Update update) {
-        String messageText = update.getMessage().getText();
-        long chatId = update.getMessage().getChatId();
-        SendMessage message = new SendMessage();
+        try {
+            String messageText = update.getMessage().getText();
+            long chatId = update.getMessage().getChatId();
+            SendMessage message = new SendMessage();
+            message.setChatId(chatId);
+            message.setText("Вы написали: " + messageText + "\n" + showPrivate.getAllInfo(update));
+            sendMsg(message);
+        } catch (Exception ex) {
+            LOGGER.error(ex.getMessage());
+            ex.printStackTrace();
+        }
+
 //            update.getMessage().getFrom();
 //            User user = new User();
-        message.setChatId(chatId);
-        message.setText("Вы написали: " + messageText + "\n" + showPrivate.getAllInfo(update) + update.hasChannelPost());
-        sendMsg(message);
     }
 }
