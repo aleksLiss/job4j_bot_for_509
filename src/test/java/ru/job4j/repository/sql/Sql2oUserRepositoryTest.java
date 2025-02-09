@@ -10,6 +10,7 @@ import ru.job4j.model.User;
 import javax.sql.DataSource;
 import java.io.InputStream;
 import java.util.Collection;
+import java.util.Optional;
 import java.util.Properties;
 
 import static org.assertj.core.api.Assertions.*;
@@ -49,6 +50,18 @@ class Sql2oUserRepositoryTest {
     }
 
     @Test
+    public void whenSaveThreeUsersThenReturnAllSavedUsers() {
+        User user1 = new User(0, 10, "Vova", "Kolobkov");
+        User user2 = new User(1, 11, "Petya", "Petrov");
+        User user3 = new User(2, 12, "Kolya", "Vaskin");
+        sql2oUserRepository.save(user1).get();
+        sql2oUserRepository.save(user2).get();
+        sql2oUserRepository.save(user3).get();
+        Collection<User> result = sql2oUserRepository.findAll();
+        assertThat(result).isNotEmpty().hasSize(3);
+    }
+
+    @Test
     public void whenSaveUserThenReturnThisUser() {
         User user = new User(1223, "Vova", "Pertov");
         User result = sql2oUserRepository.save(user).get();
@@ -61,12 +74,47 @@ class Sql2oUserRepositoryTest {
         User us2 = getDefUser();
         us2.setLastName("Petrov");
         sql2oUserRepository.save(us1);
-        assertThatThrownBy(() -> sql2oUserRepository.save(us2));
+        assertThat(sql2oUserRepository.save(us2)).isEqualTo(Optional.empty());
     }
 
     @Test
     public void whenSaveTwoUsersWithEqualLastNameThenThrownEx() {
+        User us1 = getDefUser();
+        User us2 = getDefUser();
+        us2.setFirstName("Petr");
+        sql2oUserRepository.save(us1);
+        assertThat(sql2oUserRepository.save(us2)).isEqualTo(Optional.empty());
+    }
 
+    @Test
+    public void whenSavedUserAndFindByClientIdThenReturnSavedUser() {
+        User us1 = new User(123312, "vova", "petrov");
+        sql2oUserRepository.save(us1);
+        User result = sql2oUserRepository.findByClientId(us1.getClientId()).get();
+        assertThat(result.getClientId()).isEqualTo(us1.getClientId());
+    }
+
+    @Test
+    public void whenDontSavedUserAndFindByClientIdThenReturnOptionalEmpty() {
+        User us1 = new User(123312, "vova", "petrov");
+        Optional<User> result = sql2oUserRepository.findByClientId(us1.getClientId());
+        assertThat(result).isEqualTo(Optional.empty());
+
+    }
+
+    @Test
+    public void whenSavedUserAndDeleteUserByClientIdThenReturnTrue() {
+        User us1 = new User(123312, "vova", "petrov");
+        sql2oUserRepository.save(us1);
+        boolean result = sql2oUserRepository.deleteById(us1.getClientId());
+        assertThat(result).isTrue();
+    }
+
+    @Test
+    public void whenDontSavedUserAndDeleteUserByClientIdThenReturnFalse() {
+        User us1 = new User(123312, "vova", "petrov");
+        boolean result = sql2oUserRepository.deleteById(us1.getClientId());
+        assertThat(result).isFalse();
     }
 
     private User getDefUser() {
