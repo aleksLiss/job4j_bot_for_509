@@ -9,8 +9,6 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import ru.job4j.bussines.Runner;
 import ru.job4j.model.User;
-import ru.job4j.privater.ShowPrivate;
-import ru.job4j.privater.UserShowPrivate;
 import ru.job4j.repository.sql.Sql2oUserRepository;
 
 @Service
@@ -19,17 +17,14 @@ public class TgRemoteService extends TelegramLongPollingBot implements Runner {
     private final String botName;
     private final String botToken;
     private final Sql2oUserRepository sql2oUserRepository;
-    private final ShowPrivate showPrivate;
     public static final Logger LOGGER = LoggerFactory.getLogger(TgRemoteService.class);
 
     public TgRemoteService(@Value("${telegram.bot.name}") String botName,
                            @Value("${telegram.bot.token}") String botToken,
-                           Sql2oUserRepository sql2oUserRepository,
-                           ShowPrivate showPrivate) {
+                           Sql2oUserRepository sql2oUserRepository) {
         this.botName = botName;
         this.botToken = botToken;
         this.sql2oUserRepository = sql2oUserRepository;
-        this.showPrivate = new UserShowPrivate();
     }
 
     @Override
@@ -84,14 +79,13 @@ public class TgRemoteService extends TelegramLongPollingBot implements Runner {
 
     private void add(Update update) {
         try {
-            SendMessage message = new SendMessage();
+            String messageText = update.getMessage().getText();
             User savedUser = new User();
-            savedUser.setClientId(showPrivate.getUserId(update));
-//            savedUser.setChatId(update.getMessage().getChatId());
-            savedUser.setFirstName(showPrivate.getUserFirstName(update));
-            savedUser.setLastName(showPrivate.getUserLastName(update));
             sql2oUserRepository.save(savedUser);
-            message.setText("Пользователь успешно сохранен в базу данных.");
+            long chatId = update.getMessage().getChatId();
+            SendMessage message = new SendMessage();
+            message.setChatId(chatId);
+            message.setText("Вы написали: " + messageText + "\n");
             sendMsg(message);
         } catch (Exception exception) {
             SendMessage sendErrMsg = new SendMessage();
@@ -108,7 +102,7 @@ public class TgRemoteService extends TelegramLongPollingBot implements Runner {
 //            update.getMessage().getFrom();
 //            User user = new User();
         message.setChatId(chatId);
-        message.setText("Вы написали: " + messageText + "\n" + showPrivate.getAllInfo(update) + update.hasChannelPost());
+        message.setText("Вы написали: " + messageText + "\n" + update.hasChannelPost());
         sendMsg(message);
     }
 
@@ -119,7 +113,7 @@ public class TgRemoteService extends TelegramLongPollingBot implements Runner {
 //            update.getMessage().getFrom();
 //            User user = new User();
         message.setChatId(chatId);
-        message.setText("Вы написали: " + messageText + "\n" + showPrivate.getAllInfo(update) + update.hasChannelPost());
+        message.setText("Вы написали: " + messageText + "\n" +  update.hasChannelPost());
         sendMsg(message);
     }
 
@@ -129,14 +123,11 @@ public class TgRemoteService extends TelegramLongPollingBot implements Runner {
             long chatId = update.getMessage().getChatId();
             SendMessage message = new SendMessage();
             message.setChatId(chatId);
-            message.setText("Вы написали: " + messageText + "\n" + showPrivate.getAllInfo(update));
+            message.setText("Вы написали: " + messageText + "\n");
             sendMsg(message);
         } catch (Exception ex) {
             LOGGER.error(ex.getMessage());
             ex.printStackTrace();
         }
-
-//            update.getMessage().getFrom();
-//            User user = new User();
     }
 }
