@@ -25,10 +25,6 @@ public class Sql2oUserRepository implements UserRepository {
 
     @Override
     public Optional<User> save(User user) {
-        Optional<User> foundUser = findByClientId(user.getClientId());
-        if (foundUser.isPresent()) {
-            throw new RuntimeException("Такой пользователь уже есть в базе.");
-        }
         try (Connection connection = sql2o.open()) {
             String sql = """
                     INSERT INTO users (client_id, first_name, last_name)
@@ -41,7 +37,7 @@ public class Sql2oUserRepository implements UserRepository {
                     .addParameter("lastName", user.getLastName());
             int generatedId = query.executeUpdate().getResult();
             user.setId(generatedId);
-            return Optional.ofNullable(user);
+            return Optional.of(user);
         } catch (Exception ex) {
             LOGGER.error(ex.getMessage());
         }
