@@ -1,5 +1,7 @@
 package ru.job4j.repository.sql;
 
+import org.sql2o.Connection;
+import org.sql2o.Query;
 import org.sql2o.Sql2o;
 import ru.job4j.model.User;
 import ru.job4j.repository.UserRepository;
@@ -17,7 +19,15 @@ public class Sql2oUserRepository implements UserRepository {
 
     @Override
     public User save(User user) {
-        return null;
+        try (Connection connection = sql2o.open()) {
+            Query sql = connection.createQuery("INSER INTO users (first_name, last_name) VALUES (:firstName, :lastName)",
+                            true)
+                    .addParameter(user.getFirstName())
+                    .addParameter(user.getLastName());
+            int generatedId = sql.executeUpdate().getKey(Integer.class);
+            user.setId(generatedId);
+            return user;
+        }
     }
 
     @Override
