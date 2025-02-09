@@ -13,7 +13,7 @@ public class User {
             "last_name", "lastName"
     );
 
-    private Long id;
+    private int id;
     private long clientId;
     private long chatId;
     private String firstName;
@@ -35,11 +35,11 @@ public class User {
         this.lastName = lastName;
     }
 
-    public Long getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(int id) {
         this.id = id;
     }
 
