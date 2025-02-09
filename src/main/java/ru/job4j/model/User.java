@@ -13,14 +13,14 @@ public class User {
     );
 
     private int id;
-    private long clientId;
+    private int clientId;
     private String firstName;
     private String lastName;
 
     public User() {
     }
 
-    public User(long clientId, String firstName, String lastName) {
+    public User(int clientId, String firstName, String lastName) {
         this.clientId = clientId;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -50,11 +50,11 @@ public class User {
         this.id = id;
     }
 
-    public long getClientId() {
+    public int getClientId() {
         return clientId;
     }
 
-    public void setClientId(long clientId) {
+    public void setClientId(int clientId) {
         this.clientId = clientId;
     }
 
