@@ -11,4 +11,6 @@ public interface UserRepository {
     User findByClientId(Long clientId);
 
     Collection<User> findAll();
+
+    void deleteById(Long clientId);
 }

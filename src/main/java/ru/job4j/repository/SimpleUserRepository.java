@@ -30,4 +30,9 @@ public class SimpleUserRepository implements UserRepository {
     public Collection<User> findAll() {
         return userStorage.values();
     }
+
+    @Override
+    public void deleteById(Long clientId) {
+        userStorage.remove(clientId);
+    }
 }
