@@ -7,6 +7,7 @@ import ru.job4j.repository.UserRepository;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @Repository
 public class MemoryUserRepository implements UserRepository {
@@ -23,8 +24,8 @@ public class MemoryUserRepository implements UserRepository {
     }
 
     @Override
-    public User findByClientId(Long clientId) {
-        return userStorage.get(clientId);
+    public Optional<User> findByClientId(Long clientId) {
+        return Optional.ofNullable(userStorage.get(clientId));
     }
 
     @Override
