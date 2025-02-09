@@ -9,22 +9,23 @@ import ru.job4j.bussines.Runner;
 import ru.job4j.privater.ShowPrivate;
 import ru.job4j.privater.UserShowPrivate;
 import ru.job4j.repository.UserRepository;
+import ru.job4j.repository.sql.Sql2oUserRepository;
 
 @Service
 public class TgRemoteService extends TelegramLongPollingBot implements Runner {
 
     private final String botName;
     private final String botToken;
-    private final UserRepository userRepository;
+    private final Sql2oUserRepository sql2oUserRepository;
     private final ShowPrivate showPrivate;
 
     public TgRemoteService(@Value("${telegram.bot.name}") String botName,
                            @Value("${telegram.bot.token}") String botToken,
-                           UserRepository userRepository,
+                           Sql2oUserRepository sql2oUserRepository,
                            ShowPrivate showPrivate) {
         this.botName = botName;
         this.botToken = botToken;
-        this.userRepository = userRepository;
+        this.sql2oUserRepository = sql2oUserRepository;
         this.showPrivate = new UserShowPrivate();
     }
 
@@ -79,6 +80,8 @@ public class TgRemoteService extends TelegramLongPollingBot implements Runner {
     }
 
     private void add(Update update) {
+
+
         String messageText = update.getMessage().getText();
         long chatId = update.getMessage().getChatId();
         SendMessage message = new SendMessage();
