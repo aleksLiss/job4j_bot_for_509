@@ -6,8 +6,8 @@ import java.util.Objects;
 public class User {
 
     public static final Map<String, String> COLUMN_MAPPING = Map.of(
-        "id", "id",
-        "client_id", "clientId",
+            "id", "id",
+            "client_id", "clientId",
             "chat_id", "chatId",
             "first_name", "firstName",
             "last_name", "lastName"
